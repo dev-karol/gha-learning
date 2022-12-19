@@ -13,13 +13,17 @@ on:
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
 
+env:
+  parametr1: "Hello, Worldenv"
+
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
   # This workflow contains a single job called "build"
   build:
     # The type of runner that the job will run on
     runs-on: ubuntu-latest
-
+    env:
+      version: 1.5
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
@@ -27,13 +31,30 @@ jobs:
 
       # Runs a single command using the runners shell
       - name: Run a one-line script
-        run: echo Hello, world!
+        run: echo Hello, world! ${{env.parametr1}}
+        if: ${{ true == true }}     # if odnosi się do TEGO obecnego actiona
+      
+      - run: echo ${{ toJSON(github) }}
       
       - name: Moj super action
         run: java --version
+        if: ${{ success() }}
 
       # Runs a set of commands using the runners shell
       - name: Run a multi-line script
         run: |
           echo Add other actions to build,
           echo test, and deploy your project.
+          
+  drugi-job:
+    runs-on: ubuntu-latest
+
+    steps:
+      - run: echo Witamy w drugim jobie
+      
+  trzeci-job:
+    runs-on: ubuntu-latest
+    needs: [drugi-job]      ## wykonywanie sekwencyjne, po drugim jobie
+    
+    steps:
+      - run: echo Witamy w trzecim jobie
